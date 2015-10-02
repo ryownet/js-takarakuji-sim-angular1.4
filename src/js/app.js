@@ -9,6 +9,9 @@
   var kujiUtil = require('./_kujiUtil');
   var judge = require('./_judge');
 
+  //速度計測用. 10秒間のくじ判定数をアラート
+  var isDebug = false;
+
 
   // SharedSServiceでモデルデータをコントローラ間共有
   myApp.factory('appModel', function () {
@@ -37,6 +40,13 @@
       $scope.isStart = true;
 
       kujiUtil.intervalID = setInterval( this.getKuji,  kujiUtil.INTERVAL );
+      if(isDebug){
+        setTimeout(function (){
+          clearInterval( kujiUtil.intervalID );
+          $scope.isStop = true;
+          window.alert($scope.data.totalKujiCount);
+        }, 10000);
+      }
     };
     $scope.stop = function (e) {
       $scope.isStop = true;
