@@ -20,14 +20,31 @@
       totalGetMoney: 0,
       totalKujiCount: 0,
       sagaku: 0,
+      isMinus: false,
       dispItems: []
     };
   });
 
-  myApp.controller('appCtrl', function ($scope, appModel) {
-    $scope.isMinus = false;
+  myApp.controller('appCtrl',['$scope', 'appModel', 'Jsondata', function ($scope, appModel, Jsondata) {
     $scope.data = appModel;
-  })
+    Jsondata.getSampleData().then( function(res){
+      kujiUtil.atariArr = res.data;
+      var l = kujiUtil.atariArr.length;
+      var category = '';
+      var items = [];
+      for(var i=0; i< l; i++){
+        if(kujiUtil.atariArr[i].category === category) continue;
+        category = kujiUtil.atariArr[i].category;
+        var atariVmData = {
+          name: kujiUtil.atariArr[i].name,
+          kingaku: kujiUtil.atariArr[i].kingaku,
+          category: kujiUtil.atariArr[i].category,
+          atariCount: 0
+        };
+        $scope.data.dispItems.push(atariVmData);
+      }
+    });
+  }]);
   var appCtrlScope = angular.element('#js-app').scope();
 
   myApp.controller('actionCtrl', function ($scope, appModel) {
@@ -62,48 +79,28 @@
     };
     $scope.dispResult = function (atariKuji){
       if( atariKuji.name ){
-      // console.time('t')
-
         $scope.data.totalGetMoney += atariKuji.kingaku;
         $scope.data.dispItems.forEach(function(item){
           if (item.category === atariKuji.category){
             item.atariCount++;
           }
         });
-      //console.timeEnd('t')
       }
       $scope.data.sagaku = $scope.data.totalGetMoney - $scope.data.totalSpendMoney;
-      $scope.isMinus = $scope.data.sagaku < 0;
+      $scope.data.isMinus = $scope.data.sagaku < 0;
       $scope.$apply();
     }
   });
 
-
-
-
-
-$(document).ready(function (){
-  $.getJSON('setting/data.json', function (data){
-    kujiUtil.atariArr = data;
-
-    var l = kujiUtil.atariArr.length;
-    var category = '';
-    var items = [];
-    for(var i=0; i< l; i++){
-      if(kujiUtil.atariArr[i].category === category) continue;
-      category = kujiUtil.atariArr[i].category;
-      var atariVmData = {
-        name: kujiUtil.atariArr[i].name,
-        kingaku: kujiUtil.atariArr[i].kingaku,
-        category: kujiUtil.atariArr[i].category,
-        atariCount: 0
-      };
-      var appCtrlScope = angular.element('#js-app').scope();
-      appCtrlScope.data.dispItems.push(atariVmData);
-      appCtrlScope.$apply();
+  myApp.factory('Jsondata', function ($http) {
+    return {
+      getSampleData: function () {
+        return $http.get('setting/data.json')
+        .success(function(data, status, headers, config) {
+          return data;
+        });
+      }
     }
-  })
-});
-
+  });
 
 })(window);

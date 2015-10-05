@@ -28,7 +28,7 @@
 <div class="shusi">
   <div class="text-small">収支</div>
   <div class="disp-shusi">
-    <span ng-class="{minus: isMinus}">{{data.sagaku | number}}</span><span class="unit">円</span>
+    <span ng-class="{'minus': data.isMinus}">{{data.sagaku | number}}</span><span class="unit">円</span>
   </div>
   <div class="maisuu">
     <span >{{data.totalKujiCount | number}}</span><span class="unit">枚</span>
